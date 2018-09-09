@@ -226,6 +226,7 @@ class InstagramAPI:
             if response.status_code == 200:
                 if self.configureVideo(upload_id, video, thumbnail, caption):
                     self.expose()
+                    videoData.close
         return False
 
     def uploadAlbum(self, media, caption=None, upload_id=None):
@@ -528,6 +529,8 @@ class InstagramAPI:
             'caption': caption,
         })
         return self.SendRequest('media/configure/?video=1', self.generateSignature(data))
+        clip = None
+        time.sleep(5)
 
     def configure(self, upload_id, photo, caption=''):
         (w, h) = getImageSize(photo)
