@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import requests
@@ -152,6 +152,7 @@ class InstagramAPI:
                 'photo': ('pending_media_%s.jpg' % upload_id, open(photo, 'rb'), 'application/octet-stream', {'Content-Transfer-Encoding': 'binary'})}
         if is_sidecar:
             data['is_sidecar'] = '1'
+        time.sleep(30)
         m = MultipartEncoder(data, boundary=self.uuid)
         self.s.headers.update({'X-IG-Capabilities': '3Q4=',
                                'X-IG-Connection-Type': 'WIFI',
@@ -162,6 +163,7 @@ class InstagramAPI:
                                'Connection': 'close',
                                'User-Agent': self.USER_AGENT})
         response = self.s.post(self.API_URL + "upload/photo/", data=m.to_string())
+        time.sleep(60)
         if response.status_code == 200:
             if self.configure(upload_id, photo, caption):
                 self.expose()
@@ -187,6 +189,7 @@ class InstagramAPI:
                                'Connection': 'keep-alive',
                                'User-Agent': self.USER_AGENT})
         response = self.s.post(self.API_URL + "upload/video/", data=m.to_string())
+        time.sleep(30)
         if response.status_code == 200:
             body = json.loads(response.text)
             upload_url = body['video_upload_urls'][3]['url']
@@ -223,11 +226,10 @@ class InstagramAPI:
                 self.s.headers.update({'Content-Length': str(end - start), 'Content-Range': content_range, })
                 response = self.s.post(upload_url, data=videoData[start:start + length])
             self.s.headers = headers
-
+            time.sleep(30)
             if response.status_code == 200:
                 if self.configureVideo(upload_id, video, thumbnail, caption):
                     self.expose()
-                    videoData.close
         return False
 
     def uploadAlbum(self, media, caption=None, upload_id=None):
@@ -529,9 +531,14 @@ class InstagramAPI:
             '_uid': self.username_id,
             'caption': caption,
         })
-        return self.SendRequest('media/configure/?video=1', self.generateSignature(data))
+        time.sleep(60)
+        clip.close()
         clip = None
-        time.sleep(5)
+        del clip
+        print("[ TASK ] Currently ending ffmpeg tasks... This should take ~30 seconds")
+        time.sleep(30)
+
+        return self.SendRequest('media/configure/?video=1', self.generateSignature(data))
 
     def configure(self, upload_id, photo, caption=''):
         (w, h) = getImageSize(photo)
