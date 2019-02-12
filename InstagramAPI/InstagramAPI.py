@@ -778,7 +778,7 @@ class InstagramAPI:
         return self.getUserFollowers(self.username_id)
 
     def getPendingFollowRequests(self):
-        return self.SendRequest('friendships/pending?')
+        return self.SendRequest('friendships/pending/')
 
     def like(self, mediaId):
         data = json.dumps({'_uuid': self.uuid,
